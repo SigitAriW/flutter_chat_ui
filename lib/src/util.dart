@@ -78,6 +78,17 @@ String getVerboseDateTimeRepresentation(
   return '$formattedDate, $formattedTime';
 }
 
+String getVerboseTimeRepresentation(
+    DateTime dateTime, {
+      String? dateLocale,
+      DateFormat? timeFormat,
+    }) {
+  final formattedTime = timeFormat != null
+      ? timeFormat.format(dateTime)
+      : DateFormat.Hm(dateLocale).format(dateTime);
+  return formattedTime;
+}
+
 /// Returns whether the [message] consists of a single emoji or multiple emojis
 /// depending on the given [emojiEnlargementBehavior].
 bool isConsistsOfEmojis(
