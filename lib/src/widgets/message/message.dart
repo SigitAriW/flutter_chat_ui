@@ -231,7 +231,8 @@ class Message extends StatelessWidget {
   }
 
   Widget _messageBuilder(bool currentUserIsAuthor) => Column(
-      children: [
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
       if (message.repliedMessage != null) _replyMessageContainer(currentUserIsAuthor),
         _renderMessageBuilder(),
       ],
@@ -257,7 +258,7 @@ class Message extends StatelessWidget {
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(6.0),
+                    padding: const EdgeInsets.all(1.0),
                     child: Column(
                       crossAxisAlignment:
                       CrossAxisAlignment.start,
@@ -272,7 +273,7 @@ class Message extends StatelessWidget {
                             letterSpacing: 0.14,
                           ),
                         ),
-                        _renderReplyMessageBuilder(message.repliedMessage!),
+                        _renderReplyMessageBuilder(message.repliedMessage!, currentUserIsAuthor),
                       ],
                     ),
                   ),
@@ -340,26 +341,19 @@ class Message extends StatelessWidget {
     }
   }
 
-  Widget _renderReplyMessageBuilder(types.Message message) {
+  Widget _renderReplyMessageBuilder(types.Message message, bool currentUserIsAuthor) {
     switch (message.type) {
       case types.MessageType.text:
         final textMessage = message as types.TextMessage;
-        return textMessageBuilder != null
-            ? textMessageBuilder!(
-          textMessage,
-          messageWidth: messageWidth,
-          showName: showName,
-        )
-            : TextMessage(
-          emojiEnlargementBehavior: emojiEnlargementBehavior,
-          hideBackgroundOnEmojiMessages: hideBackgroundOnEmojiMessages,
-          message: textMessage,
-          nameBuilder: nameBuilder,
-          onPreviewDataFetched: onPreviewDataFetched,
-          options: textMessageOptions,
-          showName: showName,
-          usePreviewData: usePreviewData,
-          userAgent: userAgent,
+        return Text(
+          textMessage.text,
+          style: TextStyle(
+            color:  currentUserIsAuthor ? Colors.white:Color(0xFF495057),
+            fontSize: 14,
+            fontFamily: 'Nunito',
+            fontWeight: FontWeight.w400,
+            letterSpacing: 0.14,
+          ),
         );
       default:
         return const SizedBox();
@@ -508,11 +502,11 @@ class Message extends StatelessWidget {
                 ? null
                 : TextDirection.ltr,
             children: [
-              if (currentUserIsAuthor) _statusIcon(context),
+              // if (!currentUserIsAuthor) _statusIcon(context),
               Text(
                 getVerboseTimeRepresentation(DateTime.fromMillisecondsSinceEpoch(message.createdAt!,)),
                 style: InheritedChatTheme.of(context).theme.dateDividerTextStyle,),
-              // if (!currentUserIsAuthor) _statusIcon(context),
+              if (currentUserIsAuthor) _statusIcon(context),
             ],
           ),
         ),
