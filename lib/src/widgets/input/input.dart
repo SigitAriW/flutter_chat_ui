@@ -192,7 +192,7 @@ class _InputState extends State<Input> {
                           ),
                       focusNode: _inputFocusNode,
                       keyboardType: widget.options.keyboardType,
-                      maxLines: 5,
+                      maxLines: null,
                       minLines: 1,
                       onChanged: widget.options.onTextChanged,
                       onTap: widget.options.onTextFieldTap,

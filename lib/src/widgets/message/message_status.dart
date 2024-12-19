@@ -18,11 +18,18 @@ class MessageStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (status) {
       case types.Status.delivered:
+        return InheritedChatTheme.of(context).theme.deliveredIcon != null
+            ? InheritedChatTheme.of(context).theme.deliveredIcon!
+            : Image.asset(
+                'assets/ic_msg_delivered.png',
+                color: InheritedChatTheme.of(context).theme.primaryColor,
+                package: 'flutter_chat_ui',
+              );
       case types.Status.sent:
         return InheritedChatTheme.of(context).theme.deliveredIcon != null
             ? InheritedChatTheme.of(context).theme.deliveredIcon!
             : Image.asset(
-                'assets/icon-delivered.png',
+                'assets/ic_msg_sent.png',
                 color: InheritedChatTheme.of(context).theme.primaryColor,
                 package: 'flutter_chat_ui',
               );
@@ -30,7 +37,7 @@ class MessageStatus extends StatelessWidget {
         return InheritedChatTheme.of(context).theme.errorIcon != null
             ? InheritedChatTheme.of(context).theme.errorIcon!
             : Image.asset(
-                'assets/icon-error.png',
+                'assets/ic_msg_failed.png',
                 color: InheritedChatTheme.of(context).theme.errorColor,
                 package: 'flutter_chat_ui',
               );
@@ -38,7 +45,7 @@ class MessageStatus extends StatelessWidget {
         return InheritedChatTheme.of(context).theme.seenIcon != null
             ? InheritedChatTheme.of(context).theme.seenIcon!
             : Image.asset(
-                'assets/icon-seen.png',
+                'assets/ic_msg_seen.png',
                 color: InheritedChatTheme.of(context).theme.primaryColor,
                 package: 'flutter_chat_ui',
               );

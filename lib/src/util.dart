@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform, kIsWeb;
+    show TargetPlatform, defaultTargetPlatform, kDebugMode, kIsWeb;
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:intl/intl.dart';
 
@@ -62,7 +63,7 @@ String getVerboseDateTimeRepresentation(
 }) {
   final formattedDate = dateFormat != null
       ? dateFormat.format(dateTime)
-      : DateFormat.MMMd(dateLocale).format(dateTime);
+      : DateFormat.yMd(dateLocale).format(dateTime);
   final formattedTime = timeFormat != null
       ? timeFormat.format(dateTime)
       : DateFormat.Hm(dateLocale).format(dateTime);
@@ -75,14 +76,14 @@ String getVerboseDateTimeRepresentation(
     return formattedTime;
   }
 
-  return '$formattedDate, $formattedTime';
+  return '$formattedDate';
 }
 
 String getVerboseTimeRepresentation(
-    DateTime dateTime, {
-      String? dateLocale,
-      DateFormat? timeFormat,
-    }) {
+  DateTime dateTime, {
+  String? dateLocale,
+  DateFormat? timeFormat,
+}) {
   final formattedTime = timeFormat != null
       ? timeFormat.format(dateTime)
       : DateFormat.Hm(dateLocale).format(dateTime);
@@ -236,31 +237,54 @@ List<Object> calculateChatMessages(
     }
 
     if (nextMessageDifferentDay || nextMessageDateThreshold) {
-      chatMessages.insert(
-        0,
-        DateHeader(
-          dateTime: DateTime.fromMillisecondsSinceEpoch(
-            nextMessage!.createdAt!,
-            isUtc: dateIsUtc,
-          ),
-          text: customDateHeaderText != null
-              ? customDateHeaderText(
-                  DateTime.fromMillisecondsSinceEpoch(
-                    nextMessage.createdAt!,
-                    isUtc: dateIsUtc,
-                  ),
-                )
-              : getVerboseDateTimeRepresentation(
-                  DateTime.fromMillisecondsSinceEpoch(
-                    nextMessage.createdAt!,
-                    isUtc: dateIsUtc,
-                  ),
-                  dateFormat: dateFormat,
-                  dateLocale: dateLocale,
-                  timeFormat: timeFormat,
-                ),
-        ),
+      final now = DateTime.now();
+      final parsedDate = DateTime.fromMillisecondsSinceEpoch(
+        nextMessage!.createdAt!,
+        isUtc: dateIsUtc,
       );
+      var dateDifference =
+          DateTime(parsedDate.year, parsedDate.month, parsedDate.day)
+              .difference(DateTime(now.year, now.month, now.day))
+              .inDays;
+
+      if (dateDifference == -1) {
+        chatMessages.insert(
+          0,
+          DateHeader(
+            dateTime: DateTime.fromMillisecondsSinceEpoch(
+              nextMessage!.createdAt!,
+              isUtc: dateIsUtc,
+            ),
+            text: 'Kemarin',
+          ),
+        );
+      } else {
+        chatMessages.insert(
+          0,
+          DateHeader(
+            dateTime: DateTime.fromMillisecondsSinceEpoch(
+              nextMessage!.createdAt!,
+              isUtc: dateIsUtc,
+            ),
+            text: customDateHeaderText != null
+                ? customDateHeaderText(
+                    DateTime.fromMillisecondsSinceEpoch(
+                      nextMessage.createdAt!,
+                      isUtc: dateIsUtc,
+                    ),
+                  )
+                : getVerboseDateTimeRepresentation(
+                    DateTime.fromMillisecondsSinceEpoch(
+                      nextMessage.createdAt!,
+                      isUtc: dateIsUtc,
+                    ),
+                    dateFormat: dateFormat,
+                    dateLocale: dateLocale,
+                    timeFormat: timeFormat,
+                  ),
+          ),
+        );
+      }
     }
 
     if (message.id == lastReadMessageId && !isLast) {

@@ -50,6 +50,8 @@ const secondary = Color(0xfff5f5f7);
 /// Secondary dark.
 const secondaryDark = Color(0xff2b2250);
 
+const monochromaticDark = Color(0xff5D666F);
+
 /// Base chat theme containing all required properties to make a theme.
 /// Extend this class if you want to create a custom theme.
 @immutable
@@ -333,7 +335,7 @@ class DefaultChatTheme extends ChatTheme {
       bottom: 4,
     ),
     super.dateDividerTextStyle = const TextStyle(
-      color: neutral2,
+      color: monochromaticDark,
       fontSize: 12,
       fontWeight: FontWeight.w800,
       height: 1.333,
