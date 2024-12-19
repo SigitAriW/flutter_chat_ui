@@ -6,6 +6,7 @@ import '../../conditional/conditional.dart';
 import '../../models/bubble_rtl_alignment.dart';
 import '../../models/emoji_enlargement_behavior.dart';
 import '../../util.dart';
+import '../chat_bubble.dart';
 import '../state/inherited_chat_theme.dart';
 import '../state/inherited_user.dart';
 import 'file_message.dart';
@@ -55,6 +56,7 @@ class Message extends StatelessWidget {
     required this.usePreviewData,
     this.userAgent,
     this.videoMessageBuilder,
+    this.selectedMessageList,
   });
 
   /// Build an audio message inside predefined bubble.
@@ -190,6 +192,8 @@ class Message extends StatelessWidget {
   final Widget Function(types.VideoMessage, {required int messageWidth})?
       videoMessageBuilder;
 
+  final List? selectedMessageList;
+
   Widget _avatarBuilder() => showAvatar
       ? avatarBuilder?.call(message.author) ??
           UserAvatar(
@@ -204,10 +208,11 @@ class Message extends StatelessWidget {
     BuildContext context,
     BorderRadius borderRadius,
     bool currentUserIsAuthor,
+    bool replyCurrentUserIsAuthor,
     bool enlargeEmojis,
   ) {
     final defaultMessage = (enlargeEmojis && hideBackgroundOnEmojiMessages)
-        ? _messageBuilder(currentUserIsAuthor)
+        ? _messageBuilder(currentUserIsAuthor, replyCurrentUserIsAuthor)
         : Container(
             decoration: BoxDecoration(
               borderRadius: borderRadius,
@@ -218,72 +223,33 @@ class Message extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: borderRadius,
-              child: _messageBuilder(currentUserIsAuthor),
+              child: _messageBuilder(
+                  currentUserIsAuthor, replyCurrentUserIsAuthor),
             ),
           );
     return bubbleBuilder != null
         ? bubbleBuilder!(
-            _messageBuilder(currentUserIsAuthor),
+            _messageBuilder(currentUserIsAuthor, replyCurrentUserIsAuthor),
             message: message,
             nextMessageInGroup: roundBorder,
           )
         : defaultMessage;
   }
 
-  Widget _messageBuilder(bool currentUserIsAuthor) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      if (message.repliedMessage != null) _replyMessageContainer(currentUserIsAuthor),
-        _renderMessageBuilder(),
-      ],
-    );
-
-  Widget _replyMessageContainer(bool currentUserIsAuthor,)=> Container(
-      margin: const EdgeInsetsDirectional.all(10),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(8.0),
-        border: Border(
-          left: BorderSide(width: 3, color: currentUserIsAuthor ? Colors.white : Color(0xFF212529)),
-          top: BorderSide(color: currentUserIsAuthor ? Colors.white : Color(0xFF212529)),
-          right: BorderSide(color: currentUserIsAuthor ? Colors.white : Color(0xFF212529)),
-          bottom: BorderSide(color: currentUserIsAuthor ? Colors.white : Color(0xFF212529)),
-        ),
-      ),
-      child: Column(
+  Widget _messageBuilder(
+          bool currentUserIsAuthor, bool replyCurrentUserIsAuthor) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IntrinsicHeight(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(1.0),
-                    child: Column(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          currentUserIsAuthor?'Anda':message.repliedMessage?.author.firstName??'-',
-                          style: TextStyle(
-                            color: currentUserIsAuthor ? Colors.white:Color(0xFF212529),
-                            fontSize: 14,
-                            fontFamily: 'Nunito',
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.14,
-                          ),
-                        ),
-                        _renderReplyMessageBuilder(message.repliedMessage!, currentUserIsAuthor),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          if (message.repliedMessage != null)
+            ChatBubble(
+              currentUserIsAuthor: currentUserIsAuthor,
+              replyCurrentUserIsAuthor: replyCurrentUserIsAuthor,
+              message: message,
             ),
-          ),
+          _renderMessageBuilder(),
         ],
-      ),
-    );
+      );
 
   Widget _renderMessageBuilder() {
     switch (message.type) {
@@ -341,25 +307,6 @@ class Message extends StatelessWidget {
     }
   }
 
-  Widget _renderReplyMessageBuilder(types.Message message, bool currentUserIsAuthor) {
-    switch (message.type) {
-      case types.MessageType.text:
-        final textMessage = message as types.TextMessage;
-        return Text(
-          textMessage.text,
-          style: TextStyle(
-            color:  currentUserIsAuthor ? Colors.white:Color(0xFF495057),
-            fontSize: 14,
-            fontFamily: 'Nunito',
-            fontWeight: FontWeight.w400,
-            letterSpacing: 0.14,
-          ),
-        );
-      default:
-        return const SizedBox();
-    }
-  }
-
   Widget _statusIcon(
     BuildContext context,
   ) {
@@ -382,6 +329,8 @@ class Message extends StatelessWidget {
     final query = MediaQuery.of(context);
     final user = InheritedUser.of(context).user;
     final currentUserIsAuthor = user.id == message.author.id;
+    final replyCurrentUserIsAuthor =
+        user.id == message.repliedMessage?.author.id;
     final enlargeEmojis =
         emojiEnlargementBehavior != EmojiEnlargementBehavior.never &&
             message is types.TextMessage &&
@@ -425,92 +374,122 @@ class Message extends StatelessWidget {
                 left: 20 + (isMobile ? query.padding.left : 0),
                 right: 20 + (isMobile ? query.padding.right : 0),
               ));
-
-    return Column(
-      children: [
-        Container(
-          alignment: bubbleRtlAlignment == BubbleRtlAlignment.left
-              ? currentUserIsAuthor
-              ? AlignmentDirectional.centerEnd
-              : AlignmentDirectional.centerStart
-              : currentUserIsAuthor
-              ? Alignment.centerRight
-              : Alignment.centerLeft,
-          margin: bubbleMargin,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            textDirection: bubbleRtlAlignment == BubbleRtlAlignment.left
-                ? null
-                : TextDirection.ltr,
-            children: [
-              if (!currentUserIsAuthor && showUserAvatars) _avatarBuilder(),
-              // if (currentUserIsAuthor && isLeftStatus) _statusIcon(context),
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: messageWidth.toDouble(),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onDoubleTap: () => onMessageDoubleTap?.call(context, message),
-                      onLongPress: () => onMessageLongPress?.call(context, message),
-                      onTap: () => onMessageTap?.call(context, message),
-                      child: onMessageVisibilityChanged != null
-                          ? VisibilityDetector(
-                        key: Key(message.id),
-                        onVisibilityChanged: (visibilityInfo) =>
-                            onMessageVisibilityChanged!(
-                              message,
-                              visibilityInfo.visibleFraction > 0.1,
-                            ),
-                        child: _bubbleBuilder(
-                          context,
-                          borderRadius.resolve(Directionality.of(context)),
-                          currentUserIsAuthor,
-                          enlargeEmojis,
-                        ),
+    return IntrinsicHeight(
+      child: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            decoration:
+                (selectedMessageList ?? List.empty()).contains(message.id)
+                    ? const BoxDecoration(
+                        color: Color(0x22212529),
                       )
-                          : _bubbleBuilder(
-                        context,
-                        borderRadius.resolve(Directionality.of(context)),
-                        currentUserIsAuthor,
-                        enlargeEmojis,
+                    : const BoxDecoration(
+                        color: Colors.transparent,
+                      ),
+          ),
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(0, 8, 0, 2),
+                alignment: bubbleRtlAlignment == BubbleRtlAlignment.left
+                    ? currentUserIsAuthor
+                        ? AlignmentDirectional.centerEnd
+                        : AlignmentDirectional.centerStart
+                    : currentUserIsAuthor
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                margin: bubbleMargin,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  textDirection: bubbleRtlAlignment == BubbleRtlAlignment.left
+                      ? null
+                      : TextDirection.ltr,
+                  children: [
+                    if (!currentUserIsAuthor && showUserAvatars)
+                      _avatarBuilder(),
+                    // if (currentUserIsAuthor && isLeftStatus) _statusIcon(context),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: messageWidth.toDouble(),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onDoubleTap: () =>
+                                onMessageDoubleTap?.call(context, message),
+                            onLongPress: () =>
+                                onMessageLongPress?.call(context, message),
+                            onTap: () => onMessageTap?.call(context, message),
+                            child: onMessageVisibilityChanged != null
+                                ? VisibilityDetector(
+                                    key: Key(message.id),
+                                    onVisibilityChanged: (visibilityInfo) =>
+                                        onMessageVisibilityChanged!(
+                                      message,
+                                      visibilityInfo.visibleFraction > 0.1,
+                                    ),
+                                    child: _bubbleBuilder(
+                                      context,
+                                      borderRadius
+                                          .resolve(Directionality.of(context)),
+                                      currentUserIsAuthor,
+                                      replyCurrentUserIsAuthor,
+                                      enlargeEmojis,
+                                    ),
+                                  )
+                                : _bubbleBuilder(
+                                    context,
+                                    borderRadius
+                                        .resolve(Directionality.of(context)),
+                                    currentUserIsAuthor,
+                                    replyCurrentUserIsAuthor,
+                                    enlargeEmojis,
+                                  ),
+                          ),
+                        ],
                       ),
                     ),
+                    // if (currentUserIsAuthor && !isLeftStatus) _statusIcon(context),
                   ],
                 ),
               ),
-              // if (currentUserIsAuthor && !isLeftStatus) _statusIcon(context),
+              Container(
+                alignment: bubbleRtlAlignment == BubbleRtlAlignment.left
+                    ? currentUserIsAuthor
+                        ? AlignmentDirectional.centerEnd
+                        : AlignmentDirectional.centerStart
+                    : currentUserIsAuthor
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                margin: bubbleMargin,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  textDirection: bubbleRtlAlignment == BubbleRtlAlignment.left
+                      ? null
+                      : TextDirection.ltr,
+                  children: [
+                    // if (!currentUserIsAuthor) _statusIcon(context),
+                    Text(
+                      getVerboseTimeRepresentation(
+                          DateTime.fromMillisecondsSinceEpoch(
+                        message.createdAt!,
+                      )),
+                      style: InheritedChatTheme.of(context)
+                          .theme
+                          .dateDividerTextStyle,
+                    ),
+                    if (currentUserIsAuthor) _statusIcon(context),
+                  ],
+                ),
+              ),
             ],
           ),
-        ),
-        Container(
-          alignment: bubbleRtlAlignment == BubbleRtlAlignment.left
-              ? currentUserIsAuthor
-              ? AlignmentDirectional.centerEnd
-              : AlignmentDirectional.centerStart
-              : currentUserIsAuthor
-              ? Alignment.centerRight
-              : Alignment.centerLeft,
-          margin: bubbleMargin,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            textDirection: bubbleRtlAlignment == BubbleRtlAlignment.left
-                ? null
-                : TextDirection.ltr,
-            children: [
-              // if (!currentUserIsAuthor) _statusIcon(context),
-              Text(
-                getVerboseTimeRepresentation(DateTime.fromMillisecondsSinceEpoch(message.createdAt!,)),
-                style: InheritedChatTheme.of(context).theme.dateDividerTextStyle,),
-              if (currentUserIsAuthor) _statusIcon(context),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

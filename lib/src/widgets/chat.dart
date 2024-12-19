@@ -104,6 +104,7 @@ class Chat extends StatefulWidget {
     this.slidableMessageBuilder,
     this.isLeftStatus = false,
     this.messageWidthRatio = 0.72,
+    this.selectedMessageList,
   });
 
   /// See [Message.audioMessageBuilder].
@@ -342,6 +343,8 @@ class Chat extends StatefulWidget {
   /// Width ratio for message bubble.
   final double messageWidthRatio;
 
+  final List? selectedMessageList;
+
   @override
   State<Chat> createState() => ChatState();
 }
@@ -447,6 +450,10 @@ class ChatState extends State<Chat> {
           Container(
             alignment: Alignment.center,
             margin: widget.theme.dateDividerMargin,
+            height: 46,
+            decoration: const BoxDecoration(
+              color: Color(0x11212529),
+            ),
             child: Text(
               object.text,
               style: widget.theme.dateDividerTextStyle,
@@ -468,8 +475,7 @@ class ChatState extends State<Chat> {
     } else {
       final map = object as Map<String, Object>;
       final message = map['message']! as types.Message;
-
-      final Widget messageWidget;
+      Widget messageWidget;
 
       if (message is types.SystemMessage) {
         messageWidget = widget.systemMessageBuilder?.call(message) ??
@@ -485,48 +491,48 @@ class ChatState extends State<Chat> {
                     maxWidth,
                   ).floor();
         final Widget msgWidget = Message(
-          audioMessageBuilder: widget.audioMessageBuilder,
-          avatarBuilder: widget.avatarBuilder,
-          bubbleBuilder: widget.bubbleBuilder,
-          bubbleRtlAlignment: widget.bubbleRtlAlignment,
-          customMessageBuilder: widget.customMessageBuilder,
-          customStatusBuilder: widget.customStatusBuilder,
-          emojiEnlargementBehavior: widget.emojiEnlargementBehavior,
-          fileMessageBuilder: widget.fileMessageBuilder,
-          hideBackgroundOnEmojiMessages: widget.hideBackgroundOnEmojiMessages,
-          imageHeaders: widget.imageHeaders,
-          imageMessageBuilder: widget.imageMessageBuilder,
-          imageProviderBuilder: widget.imageProviderBuilder,
-          message: message,
-          messageWidth: messageWidth,
-          nameBuilder: widget.nameBuilder,
-          onAvatarTap: widget.onAvatarTap,
-          onMessageDoubleTap: widget.onMessageDoubleTap,
-          onMessageLongPress: widget.onMessageLongPress,
-          onMessageStatusLongPress: widget.onMessageStatusLongPress,
-          onMessageStatusTap: widget.onMessageStatusTap,
-          onMessageTap: (context, tappedMessage) {
-            if (tappedMessage is types.ImageMessage &&
-                widget.disableImageGallery != true) {
-              _onImagePressed(tappedMessage);
-            }
+            audioMessageBuilder: widget.audioMessageBuilder,
+            avatarBuilder: widget.avatarBuilder,
+            bubbleBuilder: widget.bubbleBuilder,
+            bubbleRtlAlignment: widget.bubbleRtlAlignment,
+            customMessageBuilder: widget.customMessageBuilder,
+            customStatusBuilder: widget.customStatusBuilder,
+            emojiEnlargementBehavior: widget.emojiEnlargementBehavior,
+            fileMessageBuilder: widget.fileMessageBuilder,
+            hideBackgroundOnEmojiMessages: widget.hideBackgroundOnEmojiMessages,
+            imageHeaders: widget.imageHeaders,
+            imageMessageBuilder: widget.imageMessageBuilder,
+            imageProviderBuilder: widget.imageProviderBuilder,
+            message: message,
+            messageWidth: messageWidth,
+            nameBuilder: widget.nameBuilder,
+            onAvatarTap: widget.onAvatarTap,
+            onMessageDoubleTap: widget.onMessageDoubleTap,
+            onMessageLongPress: widget.onMessageLongPress,
+            onMessageStatusLongPress: widget.onMessageStatusLongPress,
+            onMessageStatusTap: widget.onMessageStatusTap,
+            onMessageTap: (context, tappedMessage) {
+              if (tappedMessage is types.ImageMessage &&
+                  widget.disableImageGallery != true) {
+                _onImagePressed(tappedMessage);
+              }
 
-            widget.onMessageTap?.call(context, tappedMessage);
-          },
-          onMessageVisibilityChanged: widget.onMessageVisibilityChanged,
-          onPreviewDataFetched: _onPreviewDataFetched,
-          roundBorder: map['nextMessageInGroup'] == true,
-          showAvatar: map['nextMessageInGroup'] == false,
-          showName: map['showName'] == true,
-          showStatus: map['showStatus'] == true,
-          isLeftStatus: widget.isLeftStatus,
-          showUserAvatars: widget.showUserAvatars,
-          textMessageBuilder: widget.textMessageBuilder,
-          textMessageOptions: widget.textMessageOptions,
-          usePreviewData: widget.usePreviewData,
-          userAgent: widget.userAgent,
-          videoMessageBuilder: widget.videoMessageBuilder,
-        );
+              widget.onMessageTap?.call(context, tappedMessage);
+            },
+            onMessageVisibilityChanged: widget.onMessageVisibilityChanged,
+            onPreviewDataFetched: _onPreviewDataFetched,
+            roundBorder: map['nextMessageInGroup'] == true,
+            showAvatar: map['nextMessageInGroup'] == false,
+            showName: map['showName'] == true,
+            showStatus: map['showStatus'] == true,
+            isLeftStatus: widget.isLeftStatus,
+            showUserAvatars: widget.showUserAvatars,
+            textMessageBuilder: widget.textMessageBuilder,
+            textMessageOptions: widget.textMessageOptions,
+            usePreviewData: widget.usePreviewData,
+            userAgent: widget.userAgent,
+            videoMessageBuilder: widget.videoMessageBuilder,
+            selectedMessageList: widget.selectedMessageList,);
         messageWidget = widget.slidableMessageBuilder == null
             ? msgWidget
             : widget.slidableMessageBuilder!(message, msgWidget);
@@ -620,27 +626,31 @@ class ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) => InheritedUser(
         user: widget.user,
-        child: InheritedChatTheme(
-          theme: widget.theme,
-          child: InheritedL10n(
-            l10n: widget.l10n,
-            child: Stack(
-              children: [
-                Container(
-                  color: widget.theme.backgroundColor,
-                  child: Column(
-                    children: [
-                      Flexible(
-                        child: widget.messages.isEmpty
-                            ? SizedBox.expand(
-                                child: _emptyStateBuilder(),
-                              )
-                            : GestureDetector(
-                                onTap: () {
-                                  FocusManager.instance.primaryFocus?.unfocus();
-                                  widget.onBackgroundTap?.call();
-                                },
-                                child: LayoutBuilder(
+        child: Center(
+          child: InheritedChatTheme(
+            theme: widget.theme,
+            child: InheritedL10n(
+              l10n: widget.l10n,
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(
+                          'assets/chat_bg_png.png',
+                          package: 'flutter_chat_ui',
+                        ),
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Flexible(
+                          child: widget.messages.isEmpty
+                              ? SizedBox.expand(
+                                  child: _emptyStateBuilder(),
+                                )
+                              : LayoutBuilder(
                                   builder: (
                                     BuildContext context,
                                     BoxConstraints constraints,
@@ -670,28 +680,29 @@ class ChatState extends State<Chat> {
                                         widget.useTopSafeAreaInset ?? isMobile,
                                   ),
                                 ),
-                              ),
-                      ),
-                      widget.customBottomWidget ??
-                          Input(
-                            isAttachmentUploading: widget.isAttachmentUploading,
-                            onAttachmentPressed: widget.onAttachmentPressed,
-                            onSendPressed: widget.onSendPressed,
-                            options: widget.inputOptions,
-                          ),
-                    ],
+                        ),
+                        widget.customBottomWidget ??
+                            Input(
+                              isAttachmentUploading:
+                                  widget.isAttachmentUploading,
+                              onAttachmentPressed: widget.onAttachmentPressed,
+                              onSendPressed: widget.onSendPressed,
+                              options: widget.inputOptions,
+                            ),
+                      ],
+                    ),
                   ),
-                ),
-                if (_isImageViewVisible)
-                  ImageGallery(
-                    imageHeaders: widget.imageHeaders,
-                    imageProviderBuilder: widget.imageProviderBuilder,
-                    images: _gallery,
-                    pageController: _galleryPageController!,
-                    onClosePressed: _onCloseGalleryPressed,
-                    options: widget.imageGalleryOptions,
-                  ),
-              ],
+                  if (_isImageViewVisible)
+                    ImageGallery(
+                      imageHeaders: widget.imageHeaders,
+                      imageProviderBuilder: widget.imageProviderBuilder,
+                      images: _gallery,
+                      pageController: _galleryPageController!,
+                      onClosePressed: _onCloseGalleryPressed,
+                      options: widget.imageGalleryOptions,
+                    ),
+                ],
+              ),
             ),
           ),
         ),
