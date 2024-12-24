@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../../../flutter_chat_ui.dart';
 import '../../conditional/conditional.dart';
 import '../../models/bubble_rtl_alignment.dart';
 import '../../models/emoji_enlargement_behavior.dart';
@@ -237,7 +238,7 @@ class Message extends StatelessWidget {
   }
 
   Widget _messageBuilder(
-          bool currentUserIsAuthor, bool replyCurrentUserIsAuthor) =>
+          bool currentUserIsAuthor, bool replyCurrentUserIsAuthor,) =>
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -247,11 +248,12 @@ class Message extends StatelessWidget {
               replyCurrentUserIsAuthor: replyCurrentUserIsAuthor,
               message: message,
             ),
-          _renderMessageBuilder(),
+          _renderMessageBuilder(currentUserIsAuthor, replyCurrentUserIsAuthor),
         ],
       );
 
-  Widget _renderMessageBuilder() {
+  Widget _renderMessageBuilder(
+      bool currentUserIsAuthor, bool replyCurrentUserIsAuthor) {
     switch (message.type) {
       case types.MessageType.audio:
         final audioMessage = message as types.AudioMessage;
@@ -302,6 +304,19 @@ class Message extends StatelessWidget {
         return videoMessageBuilder != null
             ? videoMessageBuilder!(videoMessage, messageWidth: messageWidth)
             : const SizedBox();
+      case types.MessageType.p2p:
+        final textMessage = message as types.TextMessage;
+        return textMessageBuilder != null
+            ? textMessageBuilder!(
+                textMessage,
+                messageWidth: messageWidth,
+                showName: showName,
+              )
+            : ChatBubble(
+                  currentUserIsAuthor: currentUserIsAuthor,
+                  replyCurrentUserIsAuthor: replyCurrentUserIsAuthor,
+                  message: message,
+            );
       default:
         return const SizedBox();
     }
@@ -477,7 +492,7 @@ class Message extends StatelessWidget {
                       getVerboseTimeRepresentation(
                           DateTime.fromMillisecondsSinceEpoch(
                         message.createdAt!,
-                      )),
+                      ),),
                       style: InheritedChatTheme.of(context)
                           .theme
                           .dateDividerTextStyle,

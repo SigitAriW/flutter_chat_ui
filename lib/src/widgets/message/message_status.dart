@@ -22,7 +22,6 @@ class MessageStatus extends StatelessWidget {
             ? InheritedChatTheme.of(context).theme.deliveredIcon!
             : Image.asset(
                 'assets/ic_msg_delivered.png',
-                color: InheritedChatTheme.of(context).theme.primaryColor,
                 package: 'flutter_chat_ui',
               );
       case types.Status.sent:
@@ -30,7 +29,6 @@ class MessageStatus extends StatelessWidget {
             ? InheritedChatTheme.of(context).theme.deliveredIcon!
             : Image.asset(
                 'assets/ic_msg_sent.png',
-                color: InheritedChatTheme.of(context).theme.primaryColor,
                 package: 'flutter_chat_ui',
               );
       case types.Status.error:
@@ -38,7 +36,6 @@ class MessageStatus extends StatelessWidget {
             ? InheritedChatTheme.of(context).theme.errorIcon!
             : Image.asset(
                 'assets/ic_msg_failed.png',
-                color: InheritedChatTheme.of(context).theme.errorColor,
                 package: 'flutter_chat_ui',
               );
       case types.Status.seen:
@@ -46,13 +43,12 @@ class MessageStatus extends StatelessWidget {
             ? InheritedChatTheme.of(context).theme.seenIcon!
             : Image.asset(
                 'assets/ic_msg_seen.png',
-                color: InheritedChatTheme.of(context).theme.primaryColor,
                 package: 'flutter_chat_ui',
               );
       case types.Status.sending:
         return InheritedChatTheme.of(context).theme.sendingIcon != null
             ? InheritedChatTheme.of(context).theme.sendingIcon!
-            : Center(
+            : const Center(
                 child: SizedBox(
                   height: 10,
                   width: 10,
@@ -60,7 +56,7 @@ class MessageStatus extends StatelessWidget {
                     backgroundColor: Colors.transparent,
                     strokeWidth: 1.5,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      InheritedChatTheme.of(context).theme.primaryColor,
+                      Colors.grey,
                     ),
                   ),
                 ),
