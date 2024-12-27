@@ -4,6 +4,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../flutter_chat_ui.dart';
 import '../../conditional/conditional.dart';
+import '../../constants/constants.dart';
 import '../../models/bubble_rtl_alignment.dart';
 import '../../models/emoji_enlargement_behavior.dart';
 import '../../util.dart';
@@ -262,9 +263,25 @@ class Message extends StatelessWidget {
             : const SizedBox();
       case types.MessageType.custom:
         final customMessage = message as types.CustomMessage;
-        return customMessageBuilder != null
-            ? customMessageBuilder!(customMessage, messageWidth: messageWidth)
-            : const SizedBox();
+        final metadata = customMessage.metadata;
+        if (metadata?[Constants.customMetadataKeyType] ==
+            Constants.typeChatP2P) {
+          final textMessage = message as types.CustomMessage;
+          return customMessageBuilder != null
+              ? customMessageBuilder!(
+                  textMessage,
+                  messageWidth: messageWidth
+                )
+              : ChatBubble(
+                  currentUserIsAuthor: currentUserIsAuthor,
+                  replyCurrentUserIsAuthor: replyCurrentUserIsAuthor,
+                  message: message,
+                );
+        } else {
+          return customMessageBuilder != null
+              ? customMessageBuilder!(customMessage, messageWidth: messageWidth)
+              : const SizedBox();
+        }
       case types.MessageType.file:
         final fileMessage = message as types.FileMessage;
         return fileMessageBuilder != null
@@ -304,19 +321,6 @@ class Message extends StatelessWidget {
         return videoMessageBuilder != null
             ? videoMessageBuilder!(videoMessage, messageWidth: messageWidth)
             : const SizedBox();
-      case types.MessageType.p2p:
-        final textMessage = message as types.TextMessage;
-        return textMessageBuilder != null
-            ? textMessageBuilder!(
-                textMessage,
-                messageWidth: messageWidth,
-                showName: showName,
-              )
-            : ChatBubble(
-                  currentUserIsAuthor: currentUserIsAuthor,
-                  replyCurrentUserIsAuthor: replyCurrentUserIsAuthor,
-                  message: message,
-            );
       default:
         return const SizedBox();
     }
