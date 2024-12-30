@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 
-import '../constants/constants.dart';
+import '../constants/key_metadata.dart';
 
 class ChatBubble extends StatelessWidget {
   bool currentUserIsAuthor;
@@ -114,7 +114,7 @@ class ChatBubble extends StatelessWidget {
                   margin: const EdgeInsets.all(5),
                   child: SelectionContainer.disabled(
                     child: Text(
-                      customMsg.metadata?[Constants.customMetadataKeyTitle],
+                      customMsg.metadata?[KeyMetadata.metadataKeyTitle],
                       style: TextStyle(
                         color: currentUserIsAuthor
                             ? Colors.white
@@ -136,7 +136,7 @@ class ChatBubble extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: SelectionContainer.disabled(
                 child: Text(
-                  customMsg.metadata?[Constants.customMetadataKeySubtitle],
+                  customMsg.metadata?[KeyMetadata.metadataKeySubtitle],
                   style: TextStyle(
                     color: currentUserIsAuthor
                         ? Colors.white
@@ -151,7 +151,7 @@ class ChatBubble extends StatelessWidget {
             ),
           ),
           Visibility(
-            visible: customMsg.metadata?[Constants.customMetadataKeyMediaUrl] !=
+            visible: customMsg.metadata?[KeyMetadata.metadataKeyMediaUrl] !=
                 null,
             child: IntrinsicHeight(
               child: Row(
@@ -161,7 +161,7 @@ class ChatBubble extends StatelessWidget {
                       padding: const EdgeInsets.all(2),
                       child: Image.network(
                         customMsg
-                            .metadata?[Constants.customMetadataKeyMediaUrl] ?? '',
+                            .metadata?[KeyMetadata.metadataKeyMediaUrl] ?? '',
                         width: 100,
                         height: 100,
                       ),
@@ -172,14 +172,14 @@ class ChatBubble extends StatelessWidget {
             ),
           ),
           Visibility(
-            visible: customMsg.metadata?[Constants.customMetadataKeyMediaUrl] !=
+            visible: customMsg.metadata?[KeyMetadata.metadataKeyMediaUrl] !=
                 null,
             child: IntrinsicHeight(
               child: Padding(
                 padding: const EdgeInsets.all(2),
                 child: SelectionContainer.disabled(
                   child: Text(
-                    customMsg.metadata?[Constants.customMetadataKeyDescription] ?? '',
+                    customMsg.metadata?[KeyMetadata.metadataKeyDescription] ?? '',
                     style: TextStyle(
                       color: currentUserIsAuthor
                           ? Colors.white

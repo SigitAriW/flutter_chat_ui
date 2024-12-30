@@ -4,7 +4,8 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../flutter_chat_ui.dart';
 import '../../conditional/conditional.dart';
-import '../../constants/constants.dart';
+import '../../constants/custom_message_type.dart';
+import '../../constants/key_metadata.dart';
 import '../../models/bubble_rtl_alignment.dart';
 import '../../models/emoji_enlargement_behavior.dart';
 import '../../util.dart';
@@ -264,8 +265,8 @@ class Message extends StatelessWidget {
       case types.MessageType.custom:
         final customMessage = message as types.CustomMessage;
         final metadata = customMessage.metadata;
-        if (metadata?[Constants.customMetadataKeyType] ==
-            Constants.typeChatP2P) {
+        if (metadata?[KeyMetadata.metadataKeyType] ==
+            CustomMessageType.p2p) {
           final textMessage = message as types.CustomMessage;
           return customMessageBuilder != null
               ? customMessageBuilder!(
