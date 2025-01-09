@@ -113,16 +113,22 @@ class ChatBubble extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.all(5),
                   child: SelectionContainer.disabled(
-                    child: Text(
-                      customMsg.metadata?[KeyMetadata.metadataKeyTitle],
-                      style: TextStyle(
-                        color: currentUserIsAuthor
-                            ? Colors.white
-                            : const Color(0xFF212529),
-                        fontSize: 16,
-                        fontFamily: 'Nunito',
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.14,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 200),
+                      child: Text(
+                        customMsg.metadata?[KeyMetadata.metadataKeyTitle],
+                        maxLines: 2,
+                        softWrap: true,
+                        overflow: TextOverflow.fade,
+                        style: TextStyle(
+                          color: currentUserIsAuthor
+                              ? Colors.white
+                              : const Color(0xFF212529),
+                          fontSize: 16,
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.14,
+                        ),
                       ),
                     ),
                   ),
