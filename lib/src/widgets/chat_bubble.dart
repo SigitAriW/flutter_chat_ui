@@ -159,8 +159,8 @@ class ChatBubble extends StatelessWidget {
             ),
           ),
           Visibility(
-            visible: customMsg.metadata?[KeyMetadata.metadataKeyMediaUrl] !=
-                null,
+            visible:
+                customMsg.metadata?[KeyMetadata.metadataKeyMediaUrl] != null,
             child: IntrinsicHeight(
               child: Row(
                 children: [
@@ -168,8 +168,8 @@ class ChatBubble extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(2),
                       child: Image.network(
-                        customMsg
-                            .metadata?[KeyMetadata.metadataKeyMediaUrl] ?? '',
+                        customMsg.metadata?[KeyMetadata.metadataKeyMediaUrl] ??
+                            '',
                         width: 100,
                         height: 100,
                       ),
@@ -180,14 +180,15 @@ class ChatBubble extends StatelessWidget {
             ),
           ),
           Visibility(
-            visible: customMsg.metadata?[KeyMetadata.metadataKeyMediaUrl] !=
-                null,
+            visible:
+                customMsg.metadata?[KeyMetadata.metadataKeyMediaUrl] != null,
             child: IntrinsicHeight(
               child: Padding(
                 padding: const EdgeInsets.all(2),
                 child: SelectionContainer.disabled(
                   child: Text(
-                    customMsg.metadata?[KeyMetadata.metadataKeyDescription] ?? '',
+                    customMsg.metadata?[KeyMetadata.metadataKeyDescription] ??
+                        '',
                     style: TextStyle(
                       color: currentUserIsAuthor
                           ? Colors.white
@@ -217,12 +218,21 @@ class ChatBubble extends StatelessWidget {
           IntrinsicHeight(
             child: Row(
               children: [
-                Image.asset(
-                  'assets/ic_forward.png',
-                  package: 'flutter_chat_ui',
-                  width: 20,
-                  height: 20,
-                ),
+                if (currentUserIsAuthor)
+                  Image.asset(
+                    'assets/ic_forward.png',
+                    package: 'flutter_chat_ui',
+                    width: 20,
+                    height: 20,
+                  )
+                else
+                  Image.asset(
+                    'assets/ic_forward.png',
+                    package: 'flutter_chat_ui',
+                    width: 20,
+                    height: 20,
+                    color: const Color(0xFF212529),
+                  ),
                 Container(
                   margin: const EdgeInsets.all(5),
                   child: SelectionContainer.disabled(
