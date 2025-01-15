@@ -6,6 +6,7 @@ import '../constants/key_metadata.dart';
 class ChatBubble extends StatelessWidget {
   bool currentUserIsAuthor;
   bool replyCurrentUserIsAuthor;
+  bool isForwarded;
   types.Message message;
 
   ChatBubble({
@@ -13,6 +14,7 @@ class ChatBubble extends StatelessWidget {
     required this.currentUserIsAuthor,
     required this.replyCurrentUserIsAuthor,
     required this.message,
+    this.isForwarded = false,
   });
 
   Widget _renderReplyMessageBuilder(
@@ -205,9 +207,76 @@ class ChatBubble extends StatelessWidget {
     );
   }
 
+  Widget _textForwardedMessageBuilder() {
+    final textMessage = message as types.TextMessage;
+    return Container(
+      margin: const EdgeInsetsDirectional.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        children: [
+          IntrinsicHeight(
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/ic_forward.png',
+                  package: 'flutter_chat_ui',
+                  width: 20,
+                  height: 20,
+                ),
+                Container(
+                  margin: const EdgeInsets.all(5),
+                  child: SelectionContainer.disabled(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: 200),
+                      child: Text(
+                        'Diteruskan',
+                        style: TextStyle(
+                          color: currentUserIsAuthor
+                              ? Colors.white
+                              : const Color(0xFF212529),
+                          fontSize: 14,
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IntrinsicHeight(
+            child: Container(
+              margin: const EdgeInsets.all(2),
+              alignment: Alignment.centerLeft,
+              child: SelectionContainer.disabled(
+                child: Text(
+                  textMessage.text,
+                  style: TextStyle(
+                    color: currentUserIsAuthor
+                        ? Colors.white
+                        : const Color(0xFF212529),
+                    fontSize: 16,
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.14,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (message.type == types.MessageType.text) {
+      if (isForwarded) {
+        return _textForwardedMessageBuilder();
+      }
       return _textMessageBuilder();
     } else if (message.type == types.MessageType.custom) {
       return _p2PMessageBuilder();

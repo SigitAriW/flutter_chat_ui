@@ -248,7 +248,7 @@ class Message extends StatelessWidget {
             ChatBubble(
               currentUserIsAuthor: currentUserIsAuthor,
               replyCurrentUserIsAuthor: replyCurrentUserIsAuthor,
-              message: message,
+              message: message, isForwarded: message.metadata?[KeyMetadata.metadataKeyIsForwarded] ?? false,
             ),
           _renderMessageBuilder(currentUserIsAuthor, replyCurrentUserIsAuthor),
         ],
@@ -300,23 +300,33 @@ class Message extends StatelessWidget {
               );
       case types.MessageType.text:
         final textMessage = message as types.TextMessage;
-        return textMessageBuilder != null
-            ? textMessageBuilder!(
-                textMessage,
-                messageWidth: messageWidth,
-                showName: showName,
-              )
-            : TextMessage(
-                emojiEnlargementBehavior: emojiEnlargementBehavior,
-                hideBackgroundOnEmojiMessages: hideBackgroundOnEmojiMessages,
-                message: textMessage,
-                nameBuilder: nameBuilder,
-                onPreviewDataFetched: onPreviewDataFetched,
-                options: textMessageOptions,
-                showName: showName,
-                usePreviewData: usePreviewData,
-                userAgent: userAgent,
-              );
+        final metadata = message.metadata;
+        if (metadata?[KeyMetadata.metadataKeyIsForwarded]) {
+          return ChatBubble(
+            currentUserIsAuthor: currentUserIsAuthor,
+            replyCurrentUserIsAuthor: replyCurrentUserIsAuthor,
+            message: message,
+            isForwarded: metadata?[KeyMetadata.metadataKeyIsForwarded],
+          );
+        } else {
+          return textMessageBuilder != null
+              ? textMessageBuilder!(
+                  textMessage,
+                  messageWidth: messageWidth,
+                  showName: showName,
+                )
+              : TextMessage(
+                  emojiEnlargementBehavior: emojiEnlargementBehavior,
+                  hideBackgroundOnEmojiMessages: hideBackgroundOnEmojiMessages,
+                  message: textMessage,
+                  nameBuilder: nameBuilder,
+                  onPreviewDataFetched: onPreviewDataFetched,
+                  options: textMessageOptions,
+                  showName: showName,
+                  usePreviewData: usePreviewData,
+                  userAgent: userAgent,
+                );
+        }
       case types.MessageType.video:
         final videoMessage = message as types.VideoMessage;
         return videoMessageBuilder != null

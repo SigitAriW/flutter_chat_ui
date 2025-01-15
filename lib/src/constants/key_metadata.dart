@@ -6,4 +6,5 @@ class KeyMetadata {
   static const metadataKeyMediaUrl = 'mediaUrl';
   static const metadataKeyDescription = 'description';
   static const metadataKeyIsSelected = 'isSelected';
+  static const metadataKeyIsForwarded = 'isForwarded';
 }

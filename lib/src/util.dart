@@ -241,13 +241,25 @@ List<Object> calculateChatMessages(
       final parsedDate = DateTime.fromMillisecondsSinceEpoch(
         nextMessage!.createdAt!,
         isUtc: dateIsUtc,
-      );
-      var dateDifference =
+      ).toLocal();
+
+      final dateDifference =
           DateTime(parsedDate.year, parsedDate.month, parsedDate.day)
               .difference(DateTime(now.year, now.month, now.day))
               .inDays;
 
-      if (dateDifference == -1) {
+      if (dateDifference == 0) {
+        chatMessages.insert(
+          0,
+          DateHeader(
+            dateTime: DateTime.fromMillisecondsSinceEpoch(
+              nextMessage!.createdAt!,
+              isUtc: dateIsUtc,
+            ),
+            text: 'Hari ini',
+          ),
+        );
+      } else if (dateDifference == -1) {
         chatMessages.insert(
           0,
           DateHeader(
