@@ -106,12 +106,19 @@ class ChatBubble extends StatelessWidget {
           IntrinsicHeight(
             child: Row(
               children: [
-                Image.asset(
-                  'assets/ic_send_money_msg.png',
-                  package: 'flutter_chat_ui',
-                  width: 40,
-                  height: 40,
-                ),
+                currentUserIsAuthor
+                    ? Image.asset(
+                        'assets/ic_send_money_msg.png',
+                        package: 'flutter_chat_ui',
+                        width: 40,
+                        height: 40,
+                      )
+                    : Image.asset(
+                        'assets/ic_receive_money_msg.png',
+                        package: 'flutter_chat_ui',
+                        width: 40,
+                        height: 40,
+                      ),
                 Container(
                   margin: const EdgeInsets.all(5),
                   child: SelectionContainer.disabled(

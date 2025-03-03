@@ -47,6 +47,7 @@ flutter:
     - packages/flutter_chat_ui/assets/ic_msg_seen.png
     - packages/flutter_chat_ui/assets/ic_msg_sent.png
     - packages/flutter_chat_ui/assets/ic_send_money_msg.png
+    - packages/flutter_chat_ui/assets/ic_receive_money_msg.png
     - packages/flutter_chat_ui/assets/chat_bg_png.png
     - packages/flutter_chat_ui/assets/ic_forward.png
     - packages/flutter_chat_ui/assets/2.0x/icon-arrow.png
@@ -61,6 +62,7 @@ flutter:
     - packages/flutter_chat_ui/assets/2.0x/ic_msg_seen.png
     - packages/flutter_chat_ui/assets/2.0x/ic_msg_sent.png
     - packages/flutter_chat_ui/assets/2.0x/ic_send_money_msg.png
+    - packages/flutter_chat_ui/assets/2.0x/ic_receive_money_msg.png
     - packages/flutter_chat_ui/assets/2.0x/ic_forward.png
     - packages/flutter_chat_ui/assets/3.0x/icon-arrow.png
     - packages/flutter_chat_ui/assets/3.0x/icon-attachment.png
@@ -74,4 +76,5 @@ flutter:
     - packages/flutter_chat_ui/assets/3.0x/ic_msg_seen.png
     - packages/flutter_chat_ui/assets/3.0x/ic_msg_sent.png
     - packages/flutter_chat_ui/assets/3.0x/ic_send_money_msg.png
+    - packages/flutter_chat_ui/assets/3.0x/ic_receive_money_msg.png
     - packages/flutter_chat_ui/assets/3.0x/ic_forward.png
