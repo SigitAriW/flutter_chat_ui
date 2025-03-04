@@ -167,6 +167,31 @@ class ChatBubble extends StatelessWidget {
           ),
           Visibility(
             visible:
+                customMsg.metadata?[KeyMetadata.metadataKeyDescription] != null,
+            child: IntrinsicHeight(
+              child: Container(
+                margin: const EdgeInsets.all(2),
+                alignment: Alignment.centerLeft,
+                child: SelectionContainer.disabled(
+                  child: Text(
+                    customMsg.metadata?[KeyMetadata.metadataKeyDescription] ??
+                        '',
+                    style: TextStyle(
+                      color: currentUserIsAuthor
+                          ? Colors.white
+                          : const Color(0xFF212529),
+                      fontSize: 16,
+                      fontFamily: 'Nunito',
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.14,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Visibility(
+            visible:
                 customMsg.metadata?[KeyMetadata.metadataKeyMediaUrl] != null,
             child: IntrinsicHeight(
               child: Row(
@@ -183,30 +208,6 @@ class ChatBubble extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-            ),
-          ),
-          Visibility(
-            visible:
-                customMsg.metadata?[KeyMetadata.metadataKeyMediaUrl] != null,
-            child: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.all(2),
-                child: SelectionContainer.disabled(
-                  child: Text(
-                    customMsg.metadata?[KeyMetadata.metadataKeyDescription] ??
-                        '',
-                    style: TextStyle(
-                      color: currentUserIsAuthor
-                          ? Colors.white
-                          : const Color(0xFF212529),
-                      fontSize: 16,
-                      fontFamily: 'Nunito',
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.14,
-                    ),
-                  ),
-                ),
               ),
             ),
           ),
